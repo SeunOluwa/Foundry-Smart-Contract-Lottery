@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 import {Script} from "forge-std/Script.sol";
 import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
@@ -27,6 +27,7 @@ contract HelperConfig is CodeConstants, Script {
         uint32 callbackGasLimit;
         uint256 subscriptionId;
         address link;
+        address account;
     }
 
     NetworkConfig public localNetworkConfig;
@@ -60,8 +61,9 @@ contract HelperConfig is CodeConstants, Script {
                 vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B,
                 gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
                 callbackGasLimit: 500000, // 500,000 gas
-                subscriptionId: 0,
-                link: 0x779877A7B0D9E8603169DdbD7836e478b4624789
+                subscriptionId: 75341721035226017402268460802130897367852703988933229522350515646797494196686,
+                link: 0x779877A7B0D9E8603169DdbD7836e478b4624789,
+                account: 0x6F1E2Cad3A6a38AD39A411bB80aC3cA6Cb142A3b
             });
     }
 
@@ -85,10 +87,11 @@ contract HelperConfig is CodeConstants, Script {
             entranceFee: 0.01 ether,
             interval: 30, // 30 seconds
             vrfCoordinator: address(vrfCoordinatorMock),
-            gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae, // doesn't matter
+            gasLane: 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c, // doesn't matter
             callbackGasLimit: 500000, // 500,000 gas
             subscriptionId: 0,
-            link: address(linkToken)
+            link: address(linkToken),
+            account: 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38
         });
 
         return localNetworkConfig;

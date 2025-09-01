@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {DeployRaffle} from "script/DeployRaffle.s.sol";
@@ -35,7 +35,7 @@ contract RaffleTest is Test {
 
     function setUp() external {
         DeployRaffle deployer = new DeployRaffle();
-        (raffle, helperConfig) = deployer.deployContract();
+        (raffle, helperConfig) = deployer.run();
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
         entranceFee = config.entranceFee;
         interval = config.interval;
@@ -194,9 +194,16 @@ contract RaffleTest is Test {
     }
 
     /* FULFIL RANDOM WORDS TESTS */
+    modifier skipFork() {
+        if (block.chainid != 31337) {
+            return;
+        }
+        _;
+    }
+
     function testFulfilRandomWordsCanOnlyBeCalledAfterPerformUpkeep(
         uint256 randomRequestId
-    ) public {
+    ) public raffleEntered skipFork {
         // Arrange / Act / Assert
         vm.expectRevert(VRFCoordinatorV2_5Mock.InvalidRequest.selector);
         VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(
@@ -208,6 +215,7 @@ contract RaffleTest is Test {
     function testFulfilRandomWordsPicksAWinnerResetsAndSendMoney()
         public
         raffleEntered
+        skipFork
     {
         // Arrange
         uint256 additionalEntrants = 3; // 4 total

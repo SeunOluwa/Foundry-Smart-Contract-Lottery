@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 import {Script} from "forge-std/Script.sol";
 import {Raffle} from "src/Raffle.sol";
@@ -7,11 +7,7 @@ import {HelperConfig} from "script/HelperConfig.s.sol";
 import {CreateSubscription, FundSubscription, AddConsumer} from "script/Interactions.s.sol";
 
 contract DeployRaffle is Script {
-    function run() public {
-        deployContract();
-    }
-
-    function deployContract() public returns (Raffle, HelperConfig) {
+    function run() external returns (Raffle, HelperConfig) {
         HelperConfig helperConfig = new HelperConfig();
         // local -> deploy mocks, get local config
         // sepolia -> get sepolia config
@@ -21,18 +17,19 @@ contract DeployRaffle is Script {
             // create subscription
             CreateSubscription createSubscription = new CreateSubscription();
             (config.subscriptionId, config.vrfCoordinator) = createSubscription
-                .createSubscription(config.vrfCoordinator);
+                .createSubscription(config.vrfCoordinator, config.account);
 
             // Fund it!
             FundSubscription fundSubscription = new FundSubscription();
             fundSubscription.fundSubscription(
                 config.vrfCoordinator,
                 config.subscriptionId,
-                config.link
+                config.link,
+                config.account
             );
         }
 
-        vm.startBroadcast();
+        vm.startBroadcast(config.account);
         Raffle raffle = new Raffle(
             config.entranceFee,
             config.interval,
@@ -48,7 +45,8 @@ contract DeployRaffle is Script {
         addConsumer.addConsumer(
             address(raffle),
             config.vrfCoordinator,
-            config.subscriptionId
+            config.subscriptionId,
+            config.account
         );
 
         return (raffle, helperConfig);
